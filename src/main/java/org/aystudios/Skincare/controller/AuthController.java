@@ -5,7 +5,6 @@ import org.aystudios.Skincare.dto.LoginRequest;
 import org.aystudios.Skincare.dto.SignUpRequest;
 import org.aystudios.Skincare.service.AuthService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,8 +27,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginRequest loginRequest){
-        authService.login(loginRequest);
-        return ResponseEntity.ok("Logged in successfully");
+    public ResponseEntity<String> login(@Valid @RequestBody LoginRequest loginRequest) {
+        String token = authService.login(loginRequest);
+//        return ResponseEntity.ok("Logged in successfully");
+        return ResponseEntity.ok(token);
     }
 }

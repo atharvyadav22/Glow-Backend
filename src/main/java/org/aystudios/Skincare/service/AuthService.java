@@ -1,10 +1,10 @@
 package org.aystudios.Skincare.service;
 
-import org.apache.catalina.User;
 import org.aystudios.Skincare.dto.LoginRequest;
 import org.aystudios.Skincare.dto.SignUpRequest;
 import org.aystudios.Skincare.entity.Users;
 import org.aystudios.Skincare.repository.UserRepository;
+import org.aystudios.Skincare.util.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +13,12 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     public void signUp(SignUpRequest signUpRequest){
@@ -34,7 +36,7 @@ public class AuthService {
 
     }
 
-    public void login(LoginRequest loginRequest){
+    public String login(LoginRequest loginRequest){
 
         Users user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -43,6 +45,8 @@ public class AuthService {
         if(!isPasswordMatch){
             throw new RuntimeException("Invalid password");
         }
+
+        return jwtUtil.generateToken(user.getEmail());
 
     }
 
