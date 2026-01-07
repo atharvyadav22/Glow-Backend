@@ -4,9 +4,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.aystudios.Skincare.entity.Users;
+import org.aystudios.Skincare.entity.UserEntity;
 import org.aystudios.Skincare.repository.UserRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -30,16 +31,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String autHeader = request.getHeader("Authorization");
 
-        if(autHeader != null && autHeader.startsWith("Bearer")){
+        if(autHeader != null && autHeader.startsWith("Bearer ")){
             String token = autHeader.substring(7);
 
             if(jwtUtil.isTokenValid(token)){
                 String email = jwtUtil.extractEmail(token);
 
-                Users user = userRepository.findByEmail(email).orElse(null);
+                UserEntity user = userRepository.findByEmail(email).orElse(null);
 
                 if(user != null){
-                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getEmail(), null, List.of(() -> "ROLE_" + user.getRole()));
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getEmail(), null, List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole())));
+
 
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }

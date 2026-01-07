@@ -11,9 +11,9 @@ import java.util.Date;
 public class JwtUtil {
 
     private static final String SECRET_KEY = "org.aystudios-glow-app.backend-secret.key-220805"; // Works as a signature or stamp to validate the token.
-    private static final long EXPIRATION_TIME = 1000*60*60;
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60;
 
-    public String generateToken(String email){
+    public String generateToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
@@ -22,21 +22,21 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String extractEmail(String token){
+    public String extractEmail(String token) {
         return Jwts.parserBuilder().setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
                 .build()
-                .parseClaimsJwt(token)
+                .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
     }
 
-    public boolean isTokenValid(String token){
-        try{
+    public boolean isTokenValid(String token) {
+        try {
             Jwts.parserBuilder().setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
                     .build()
-                    .parseClaimsJwt(token); // Verify + Decode tokens
+                    .parseClaimsJws(token); // Verify + Decode tokens
             return true;
-        }catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }

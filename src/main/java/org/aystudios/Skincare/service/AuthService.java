@@ -1,13 +1,17 @@
 package org.aystudios.Skincare.service;
 
-import org.aystudios.Skincare.dto.LoginRequest;
-import org.aystudios.Skincare.dto.SignUpRequest;
-import org.aystudios.Skincare.entity.Users;
+import org.aystudios.Skincare.dto.LoginRequestDTO;
+import org.aystudios.Skincare.dto.SignUpRequestDTO;
+import org.aystudios.Skincare.entity.UserEntity;
 import org.aystudios.Skincare.repository.UserRepository;
 import org.aystudios.Skincare.util.JwtUtil;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
+@Qualifier("authService")
 @Service
 public class AuthService {
 
@@ -21,26 +25,26 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
-    public void signUp(SignUpRequest signUpRequest){
+    public void signUp(SignUpRequestDTO signUpRequestDTO){
 
-        if(userRepository.findByEmail(signUpRequest.getEmail()).isPresent()){
-            throw new RuntimeException("User with " + signUpRequest.getEmail() + " already exists");
+        if(userRepository.findByEmail(signUpRequestDTO.getEmail()).isPresent()){
+            throw new RuntimeException("User with " + signUpRequestDTO.getEmail() + " already exists");
         }
 
-        Users user = new Users();
-        user.setEmail(signUpRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+        UserEntity user = new UserEntity();
+        user.setEmail(signUpRequestDTO.getEmail());
+        user.setPassword(passwordEncoder.encode(signUpRequestDTO.getPassword()));
         user.setRole("USER");
 
         userRepository.save(user);
 
     }
 
-    public String login(LoginRequest loginRequest){
+    public String login(LoginRequestDTO loginRequestDTO){
 
-        Users user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+        UserEntity user = userRepository.findByEmail(loginRequestDTO.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
 
-        boolean isPasswordMatch = passwordEncoder.matches(loginRequest.getPassword(), user.getPassword());
+        boolean isPasswordMatch = passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword());
 
         if(!isPasswordMatch){
             throw new RuntimeException("Invalid password");
@@ -48,6 +52,11 @@ public class AuthService {
 
         return jwtUtil.generateToken(user.getEmail());
 
+    }
+
+    public List<UserEntity> getAllUsers(){
+
+        return userRepository.findAll();
     }
 
 }
