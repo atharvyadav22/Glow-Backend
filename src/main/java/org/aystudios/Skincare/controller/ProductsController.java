@@ -48,7 +48,6 @@ public class ProductsController {
 
 
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ProductEntity getProductById(@PathVariable Long id) {
         return productService.getProductById(id);

@@ -2,10 +2,13 @@ package org.aystudios.Skincare.controller;
 
 import jakarta.validation.Valid;
 import org.aystudios.Skincare.dto.LoginRequestDTO;
+import org.aystudios.Skincare.dto.LoginResponseDTO;
+import org.aystudios.Skincare.dto.RefreshRequestDTO;
 import org.aystudios.Skincare.dto.SignUpRequestDTO;
 import org.aystudios.Skincare.entity.UserEntity;
 import org.aystudios.Skincare.service.AuthService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,14 +30,18 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
-        String token = authService.login(loginRequestDTO);
-//        return ResponseEntity.ok("Logged in successfully");
-        return ResponseEntity.ok(token);
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
+        return ResponseEntity.ok((authService.login(loginRequestDTO)));
     }
 
-    @GetMapping("/getAllUsers")
-    public ResponseEntity<List<UserEntity>> getAllUsers(){
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponseDTO> refreshToken(@RequestBody RefreshRequestDTO refreshRequestDTO) {
+        return ResponseEntity.ok(authService.refreshToken(refreshRequestDTO));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/users")
+    public ResponseEntity<List<UserEntity>> getAllUsers() {
         return ResponseEntity.ok(authService.getAllUsers());
     }
 }

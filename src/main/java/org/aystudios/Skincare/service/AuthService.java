@@ -1,6 +1,8 @@
 package org.aystudios.Skincare.service;
 
 import org.aystudios.Skincare.dto.LoginRequestDTO;
+import org.aystudios.Skincare.dto.LoginResponseDTO;
+import org.aystudios.Skincare.dto.RefreshRequestDTO;
 import org.aystudios.Skincare.dto.SignUpRequestDTO;
 import org.aystudios.Skincare.entity.UserEntity;
 import org.aystudios.Skincare.repository.UserRepository;
@@ -25,9 +27,9 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
-    public void signUp(SignUpRequestDTO signUpRequestDTO){
+    public void signUp(SignUpRequestDTO signUpRequestDTO) {
 
-        if(userRepository.findByEmail(signUpRequestDTO.getEmail()).isPresent()){
+        if (userRepository.findByEmail(signUpRequestDTO.getEmail()).isPresent()) {
             throw new RuntimeException("User with " + signUpRequestDTO.getEmail() + " already exists");
         }
 
@@ -40,21 +42,30 @@ public class AuthService {
 
     }
 
-    public String login(LoginRequestDTO loginRequestDTO){
+    public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
 
         UserEntity user = userRepository.findByEmail(loginRequestDTO.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
 
         boolean isPasswordMatch = passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword());
 
-        if(!isPasswordMatch){
-            throw new RuntimeException("Invalid password");
+        if (!isPasswordMatch) {
+            throw new RuntimeException("Invalid credentials");
         }
 
-        return jwtUtil.generateToken(user.getEmail());
+        return new LoginResponseDTO(jwtUtil.generateAccessToken(user.getEmail()), jwtUtil.generateRefreshToken(user.getEmail()), "Bearer", jwtUtil.getAccessTokenExpiry());
 
     }
 
-    public List<UserEntity> getAllUsers(){
+    public LoginResponseDTO refreshToken(RefreshRequestDTO refreshRequestDTO) {
+
+        if (!jwtUtil.isTokenValid(refreshRequestDTO.getRefreshToken())) {
+            throw new RuntimeException("Invalid refresh token");
+        }
+
+        return new LoginResponseDTO(jwtUtil.generateAccessToken(jwtUtil.extractEmail(refreshRequestDTO.getRefreshToken())), jwtUtil.generateRefreshToken(jwtUtil.extractEmail(refreshRequestDTO.getRefreshToken())), "Bearer", jwtUtil.getAccessTokenExpiry());
+    }
+
+    public List<UserEntity> getAllUsers() {
 
         return userRepository.findAll();
     }
