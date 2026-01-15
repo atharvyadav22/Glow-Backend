@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Qualifier("productService")
 @Service
 public class ProductService {
@@ -33,7 +35,8 @@ public class ProductService {
 
     public Page<ProductResponseDTO> getAllProducts(int page, int size, String category, String sortBy, String direction) {
         Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-        Pageable pageable = PageRequest.of(page, size, sort);
+        int pageNumber = Math.max(page-1,0);
+        Pageable pageable = PageRequest.of(pageNumber, size, sort);
 
         Page<ProductEntity> productEntities;
         if (category != null && !category.isBlank())
@@ -45,23 +48,24 @@ public class ProductService {
     }
 
 
-    public ProductEntity getProductById(Long id) {
-        return productRepository
-                .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id " + id));
+    public ProductResponseDTO getProductById(Long id) {
+        ProductEntity entity = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found with id " + id));
+
+        return ProductMapper.toResponse(entity);
     }
 
     public Page<ProductResponseDTO> searchProducts(String keyword, int page, int size, String sortBy, String direction) {
         Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-
         Pageable pageable = PageRequest.of(page, size, sort);
-        return productRepository.searchProducts(keyword, pageable).map(ProductMapper::toResponse);
+
+        if (keyword == null || keyword.isBlank()) return null;
+        else return productRepository.searchProducts(keyword, pageable).map(ProductMapper::toResponse);
     }
 
 
     public ProductResponseDTO updateProduct(Long id, ProductRequestDTO dto) {
 
-        ProductEntity existing = getProductById(id);
+        ProductEntity existing = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found with id " + id));
 
         existing.setName(dto.getName());
         existing.setBrand(dto.getBrand());
@@ -71,7 +75,8 @@ public class ProductService {
         existing.setProductAvailable(dto.getProductAvailable());
         existing.setQuantity(dto.getQuantity());
 
-        return ProductMapper.toResponse(productRepository.save(existing));
+        ProductEntity productEntity = productRepository.save(existing);
+        return ProductMapper.toResponse(productEntity);
     }
 
 
@@ -82,6 +87,22 @@ public class ProductService {
         }
 
         productRepository.deleteById(id);
+    }
+
+    public List<String> getCategories(){
+        return productRepository.findAllCategories();
+    }
+
+    public Page<ProductResponseDTO> getProductsByCategory(String category, int page, int size, String sortBy, String direction){
+        Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        int pageNumber = Math.max(page - 1, 0);
+        Pageable pageable = PageRequest.of(pageNumber, size, sort);
+
+        Page<ProductEntity> productEntities = productRepository.findByCategoryIgnoreCase(category, pageable);
+
+        if (productEntities.isEmpty()) throw new ResourceNotFoundException("No products found for category " + category);
+
+        return productEntities.map(ProductMapper::toResponse);
     }
 
 }

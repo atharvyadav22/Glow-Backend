@@ -6,8 +6,12 @@ import org.aystudios.Skincare.dto.ProductResponseDTO;
 import org.aystudios.Skincare.entity.ProductEntity;
 import org.aystudios.Skincare.service.ProductService;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
@@ -19,6 +23,7 @@ public class ProductsController {
         this.productService = productService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ProductResponseDTO addProduct(@Valid @RequestBody ProductRequestDTO dto){
         return productService.addProduct(dto);
@@ -26,7 +31,7 @@ public class ProductsController {
 
     @GetMapping
     public Page<ProductResponseDTO> getAllProducts(
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -49,10 +54,9 @@ public class ProductsController {
 
 
     @GetMapping("/{id}")
-    public ProductEntity getProductById(@PathVariable Long id) {
+    public ProductResponseDTO getProductById(@PathVariable Long id) {
         return productService.getProductById(id);
     }
-
 
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -70,6 +74,24 @@ public class ProductsController {
         productService.deleteProduct(id);
     }
 
+    @GetMapping("/categories")
+    public ResponseEntity<List<String>> getCategories(){
+        return ResponseEntity.ok(productService.getCategories());
+    }
 
+    @GetMapping("/category/{category}")
+    public ResponseEntity<Page<ProductResponseDTO>> getProductsByCategory(
+            @PathVariable String category,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+    ){
+        return ResponseEntity.ok(productService.getProductsByCategory(category, page, size, sortBy, direction));
+    }
 
+    @GetMapping("/test")
+    public String test(){
+        return "Product Test";
+    }
 }
