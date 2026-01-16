@@ -3,7 +3,7 @@ package org.aystudios.Skincare.service;
 import org.aystudios.Skincare.dto.ProductRequestDTO;
 import org.aystudios.Skincare.dto.ProductResponseDTO;
 import org.aystudios.Skincare.entity.ProductEntity;
-import org.aystudios.Skincare.exception.ResourceNotFoundException;
+import org.aystudios.Skincare.exception.general.ResourceNotFoundException;
 import org.aystudios.Skincare.mapper.ProductMapper;
 import org.aystudios.Skincare.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
