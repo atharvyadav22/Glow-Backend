@@ -1,4 +1,4 @@
-package org.aystudios.Skincare.exception;
+package org.aystudios.Skincare.exception.general;
 
 public class ResourceNotFoundException extends RuntimeException{
 

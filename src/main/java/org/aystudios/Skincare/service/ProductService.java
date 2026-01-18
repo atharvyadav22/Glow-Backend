@@ -12,8 +12,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
+
 
 @Qualifier("productService")
 @Service
@@ -35,8 +35,7 @@ public class ProductService {
 
     public Page<ProductResponseDTO> getAllProducts(int page, int size, String category, String sortBy, String direction) {
         Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-        int pageNumber = Math.max(page-1,0);
-        Pageable pageable = PageRequest.of(pageNumber, size, sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         Page<ProductEntity> productEntities;
         if (category != null && !category.isBlank())
@@ -95,8 +94,7 @@ public class ProductService {
 
     public Page<ProductResponseDTO> getProductsByCategory(String category, int page, int size, String sortBy, String direction){
         Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-        int pageNumber = Math.max(page - 1, 0);
-        Pageable pageable = PageRequest.of(pageNumber, size, sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         Page<ProductEntity> productEntities = productRepository.findByCategoryIgnoreCase(category, pageable);
 
