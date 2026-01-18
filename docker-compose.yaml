@@ -6,7 +6,7 @@ services:
     container_name: glow-postgres
     restart: always
     environment:
-      POSTGRES_DB: ${DB_URL}
+      POSTGRES_DB: skincare_db
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
