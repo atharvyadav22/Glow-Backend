@@ -60,4 +60,3 @@ Thumbs.db
 # Environment & Secrets
 # =========================
 .env
-application.yaml
