@@ -12,7 +12,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -28,27 +27,49 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
 
-        String autHeader = request.getHeader("Authorization");
+        String authHeader = request.getHeader("Authorization");
 
-        if(autHeader != null && autHeader.startsWith("Bearer ")){
-            String token = autHeader.substring(7);
-
-            if(jwtUtil.isTokenValid(token)){
-                String email = jwtUtil.extractEmail(token);
-
-                UserEntity user = userRepository.findByEmail(email).orElse(null);
-
-                if(user != null){
-                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getEmail(), null, List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole())));
-
-
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                }
-            }
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
         }
-        filterChain.doFilter(request, response);
 
+        String token = authHeader.substring(7);
+
+        if (!jwtUtil.isTokenValid(token)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("""
+            {
+              "status": 401,
+              "code": "UNAUTHORIZED",
+              "message": "Invalid or expired access token"
+            }
+        """);
+            return;
+        }
+
+        String email = jwtUtil.extractEmail(token);
+        UserEntity user = userRepository.findByEmail(email).orElse(null);
+
+        if (user != null) {
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            user.getEmail(),
+                            null,
+                            List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()))
+                    );
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+
+        filterChain.doFilter(request, response);
     }
+
 }

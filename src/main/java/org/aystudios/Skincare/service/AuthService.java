@@ -6,6 +6,7 @@ import org.aystudios.Skincare.dto.RefreshRequestDTO;
 import org.aystudios.Skincare.dto.SignUpRequestDTO;
 import org.aystudios.Skincare.entity.UserEntity;
 import org.aystudios.Skincare.exception.auth.InvalidPasswordException;
+import org.aystudios.Skincare.exception.auth.InvalidTokenException;
 import org.aystudios.Skincare.exception.auth.UserAlreadyExistedException;
 import org.aystudios.Skincare.exception.auth.UserNotFoundException;
 import org.aystudios.Skincare.repository.UserRepository;
@@ -61,7 +62,7 @@ public class AuthService {
 
     public LoginResponseDTO refreshToken(RefreshRequestDTO refreshRequestDTO) {
         if (!jwtUtil.isTokenValid(refreshRequestDTO.getRefreshToken())) {
-            throw new RuntimeException("Invalid refresh token");
+            throw new InvalidTokenException( );
         }
         String email = jwtUtil.extractEmail(refreshRequestDTO.getRefreshToken());
         return new LoginResponseDTO(jwtUtil.generateAccessToken(email), jwtUtil.generateRefreshToken(email), "Bearer", jwtUtil.getAccessTokenExpiry());

@@ -70,7 +70,7 @@ public class ProductService {
         existing.setBrand(dto.getBrand());
         existing.setCategory(dto.getCategory());
         existing.setDescription(dto.getDescription());
-        existing.setPrice(dto.getPrice());
+        existing.setOriginalPrice(dto.getOriginalPrice());
         existing.setProductAvailable(dto.getProductAvailable());
         existing.setQuantity(dto.getQuantity());
 

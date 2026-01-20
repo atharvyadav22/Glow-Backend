@@ -28,7 +28,11 @@ public class ProductRequestDTO {
 
     @NotNull
     @Positive
-    private BigDecimal price;
+    private BigDecimal originalPrice;
+
+    @NotNull
+    @Positive
+    private BigDecimal discountPrice;
 
     @NotNull
     private Boolean productAvailable;

@@ -14,7 +14,8 @@ public class ProductMapper {
         p.setBrand(dto.getBrand());
         p.setCategory(dto.getCategory());
         p.setDescription(dto.getDescription());
-        p.setPrice(dto.getPrice());
+        p.setOriginalPrice(dto.getOriginalPrice());
+        p.setDiscountPrice(dto.getDiscountPrice());
         p.setProductAvailable(dto.getProductAvailable());
         p.setQuantity(dto.getQuantity());
         return p;
@@ -27,7 +28,8 @@ public class ProductMapper {
                 p.getBrand(),
                 p.getCategory(),
                 p.getDescription(),
-                p.getPrice(),
+                p.getOriginalPrice(),
+                p.getDiscountPrice(),
                 p.getProductAvailable(),
                 p.getQuantity()
         );

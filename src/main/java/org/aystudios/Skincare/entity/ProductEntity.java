@@ -21,7 +21,8 @@ public class ProductEntity {
     private String brand;
     private String category;
     private String description;
-    private BigDecimal price;
+    private BigDecimal originalPrice;
+    private BigDecimal discountPrice;
     private Boolean productAvailable;
     private Integer quantity;
 
