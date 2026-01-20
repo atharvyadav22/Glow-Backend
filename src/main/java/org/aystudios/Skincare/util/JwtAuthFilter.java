@@ -7,11 +7,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.aystudios.Skincare.entity.UserEntity;
 import org.aystudios.Skincare.repository.UserRepository;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -33,6 +36,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
+        SecurityContextHolder.clearContext();
+
+        String path = request.getRequestURI();
+
+        // 🔥 बस यही सबसे important line है
+        if (path.startsWith("/api/auth/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -42,17 +55,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
 
+        // ❌ Invalid / expired token → simple 401
         if (!jwtUtil.isTokenValid(token)) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            response.getWriter().write("""
-            {
-              "status": 401,
-              "code": "UNAUTHORIZED",
-              "message": "Invalid or expired access token"
-            }
-        """);
-            return;
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Invalid or expired access token"
+            );
         }
 
         String email = jwtUtil.extractEmail(token);

@@ -17,7 +17,8 @@ import java.util.List;
 
 @Qualifier("productService")
 @Service
-public class ProductService {
+public class
+ProductService {
 
     private final ProductRepository productRepository;
 
