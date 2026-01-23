@@ -1,105 +1,100 @@
 package org.aystudios.Skincare.util;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
 
+    private final SecretKey key;
 
-    private final String SECRET_KEY; // Works as a signature or stamp to validate the token.
-    private static final String TOKEN_TYPE = "type";
-    private static final String ACCESS = "access";
+    private static final String TYPE = "type";
+    private static final String ROLE = "role";
+
+    private static final String ACCESS  = "access";
     private static final String REFRESH = "refresh";
 
+    private static final long ACCESS_EXPIRY  = 15 * 60 * 1000;
+    private static final long REFRESH_EXPIRY = 7 * 24 * 60 * 60 * 1000;
 
-    public JwtUtil(@Value("${jwt.secret}") String SECRET_KEY) {
-        this.SECRET_KEY = SECRET_KEY;
+    public JwtUtil(@Value("${jwt.secret}") String secret) {
+        this.key = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
+    // ---------- TOKEN GENERATION ----------
 
-    private static final long ACCESS_TOKEN_EXPIRY = 15 * 60 * 1000; // 15 min
-    private static final long REFRESH_TOKEN_EXPIRY = 7 * 24 * 60 * 60 * 1000; // 7 days
-
-    public long getAccessTokenExpiry() {
-        return 15 * 60 * 1000;
+    public String generateAccessToken(String email, String role) {
+        return buildToken(email, role, ACCESS, ACCESS_EXPIRY);
     }
-
-    public String generateAccessToken(String email) {
-        return Jwts.builder()
-                .setSubject(email)
-                .claim(TOKEN_TYPE, ACCESS)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRY))
-                .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()), SignatureAlgorithm.HS256)
-                .compact();
-    }
-
 
     public String generateRefreshToken(String email) {
+        return buildToken(email, null, REFRESH, REFRESH_EXPIRY);
+    }
+
+    private String buildToken(
+            String email,
+            String role,
+            String type,
+            long expiry
+    ) {
         return Jwts.builder()
                 .setSubject(email)
-                .claim(TOKEN_TYPE, REFRESH)
+                .claim(TYPE, type)
+                .claim(ROLE, role)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRY))
-                .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()), SignatureAlgorithm.HS256)
+                .setExpiration(new Date(System.currentTimeMillis() + expiry))
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
+    // ---------- VALIDATION ----------
+
+    public boolean isValidAccessToken(String token) {
+        return isValid(token, ACCESS);
+    }
+
+    public boolean isValidRefreshToken(String token) {
+        return isValid(token, REFRESH);
+    }
+
+    private boolean isValid(String token, String expectedType) {
+        try {
+            Claims claims = extractAllClaims(token);
+            return expectedType.equals(claims.get(TYPE));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // ---------- CLAIM EXTRACTION ----------
 
     public String extractEmail(String token) {
-        return Jwts.parserBuilder().setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
+        return extractAllClaims(token).getSubject();
+    }
+
+    public String extractRole(String token) {
+        return extractAllClaims(token).get(ROLE, String.class);
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody();
     }
 
-
-    public boolean isAccessToken(String token) {
-        try {
-            String type = Jwts.parserBuilder()
-                    .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .get(TOKEN_TYPE, String.class);
-
-            return ACCESS.equals(type);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public boolean isRefreshToken(String token) {
-        try {
-            String type = Jwts.parserBuilder()
-                    .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .get(TOKEN_TYPE, String.class);
-
-            return REFRESH.equals(type);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-
-    public boolean isTokenValid(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
-                    .build()
-                    .parseClaimsJws(token); // Verify + Decode tokens
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+    public long getAccessTokenExpiry() {
+        return ACCESS_EXPIRY;
     }
 }
+
+
+

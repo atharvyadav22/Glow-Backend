@@ -1,7 +1,7 @@
 package org.aystudios.Skincare.exception.auth;
 
 public class UserNotFoundException extends RuntimeException{
-    public UserNotFoundException(){
-        super(("User not found"));
+    public UserNotFoundException(String email){
+        super(("User with " + email + " does not exist."));
     }
 }

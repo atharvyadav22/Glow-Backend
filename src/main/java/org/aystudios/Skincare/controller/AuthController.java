@@ -23,6 +23,9 @@ public class AuthController {
         this.authService = authService;
     }
 
+    @GetMapping("/test")
+    public String test(){ return "API Called";}
+
     @PostMapping("/signup")
     public ResponseEntity<String> signUp(@Valid @RequestBody SignUpRequestDTO signUpRequestDTO) {
         authService.signUp(signUpRequestDTO);
