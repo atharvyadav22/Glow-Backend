@@ -24,5 +24,10 @@ public class UserEntity {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    private String name;
+    private String phoneNo;
+    private String address;
+    private String profilePicUrl;
 }
 
