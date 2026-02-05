@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 
-@Qualifier("productService")
 @Service
 public class
 ProductService {
