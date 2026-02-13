@@ -3,11 +3,13 @@ package org.aystudios.Skincare.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "cart_items", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "product_id"}))
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class CartItemEntity {
 
     @Id

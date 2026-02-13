@@ -9,7 +9,7 @@ public class UserMapper {
     public static UserEntity toEntity(UserProfileRequestDTO dto) {
         UserEntity entity = new UserEntity();
         entity.setName(dto.getName());
-        entity.setPhoneNo(dto.getPhone());
+        entity.setPhoneNo(dto.getPhoneNo());
         entity.setAddress(dto.getAddress());
         entity.setProfilePicUrl(dto.getProfilePicUrl());
 

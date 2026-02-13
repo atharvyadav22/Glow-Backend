@@ -10,7 +10,7 @@ public class UserProfileRequestDTO {
     @Length(min = 3, max = 20, message = "Name must be between 3 and 20 characters")
     private String name;
     @Length(min = 10, max = 10, message = "Phone number must be 10 digits")
-    private String phone;
+    private String phoneNo;
     private String address;
     private String profilePicUrl;
 

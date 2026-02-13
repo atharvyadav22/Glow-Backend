@@ -1,16 +1,19 @@
 package org.aystudios.Skincare.service;
 
-import org.aystudios.Skincare.dto.AddToCartRequestDTO;
+import org.aystudios.Skincare.dto.CartRequestDTO;
 import org.aystudios.Skincare.dto.CartResponseDTO;
 import org.aystudios.Skincare.entity.CartItemEntity;
 import org.aystudios.Skincare.entity.ProductEntity;
 import org.aystudios.Skincare.entity.UserEntity;
 import org.aystudios.Skincare.exception.auth.UserNotFoundException;
 import org.aystudios.Skincare.exception.product.ProductNotFoundException;
+import org.aystudios.Skincare.mapper.CartMapper;
 import org.aystudios.Skincare.repository.CartRepository;
 import org.aystudios.Skincare.repository.ProductRepository;
 import org.aystudios.Skincare.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +31,7 @@ public class CartService {
     }
 
     // ----- Add to Cart -----
-    public void addToCart(String email, AddToCartRequestDTO dto) {
+    public CartResponseDTO addToCart(String email, CartRequestDTO dto) {
 
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
         ProductEntity productEntity = productRepository.findById(dto.getProductId()).orElseThrow(() -> new ProductNotFoundException());
@@ -43,7 +46,8 @@ public class CartService {
             cartItemEntity.setQuantity(cartItemEntity.getQuantity() + dto.getQuantity());
         }
 
-        cartRepository.save(cartItemEntity);
+        CartItemEntity response = cartRepository.save(cartItemEntity);
+        return CartMapper.toResponse(response);
     }
 
     // ----- Get Cart Items -----
@@ -57,17 +61,8 @@ public class CartService {
         List<CartResponseDTO> response = new ArrayList<>();
 
         for (CartItemEntity item : cartItems) {
-
-            CartResponseDTO dto = new CartResponseDTO(
-                    item.getProduct().getId(),
-                    item.getQuantity(),
-                    item.getProduct().getName(),
-                    item.getProduct().getDescription(),
-                    item.getProduct().getOriginalPrice(),
-                    item.getProduct().getDiscountPrice()
-            );
+            CartResponseDTO dto = CartMapper.toResponse(item);
             response.add(dto);
-
         }
 
         return response;
@@ -75,6 +70,7 @@ public class CartService {
 
 
     // ----- Remove Item -----
+    @Transactional
     public void removeItem(String email, Long productId) {
 
         UserEntity user = userRepository.findByEmail(email)
@@ -84,6 +80,14 @@ public class CartService {
                 .orElseThrow(() -> new ProductNotFoundException());
 
         cartRepository.deleteByUserAndProduct(user, product);
+    }
+
+    // ----- Get All Cart Items -----
+    public List<CartResponseDTO> getAllCartItems(){
+
+        List<CartItemEntity> entity = cartRepository.findAll();
+
+        return entity.stream().map(CartMapper::toResponse).toList();
     }
 
 

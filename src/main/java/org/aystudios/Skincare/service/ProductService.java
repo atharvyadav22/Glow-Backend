@@ -43,7 +43,7 @@ ProductService {
         else
             productEntities = productRepository.findAll(pageable);
 
-        return productEntities.map(ProductMapper::toResponse);
+        return productEntities.map(item -> ProductMapper.toResponse(item));
     }
 
 

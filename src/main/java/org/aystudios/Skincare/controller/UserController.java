@@ -23,7 +23,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getProfile(email));
     }
 
-    @PostMapping
+    @PutMapping
     public ResponseEntity<UserProfileResponseDTO> updateProfile(@RequestBody UserProfileRequestDTO dto){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         UserProfileResponseDTO response = userService.updateProfile(email, dto);

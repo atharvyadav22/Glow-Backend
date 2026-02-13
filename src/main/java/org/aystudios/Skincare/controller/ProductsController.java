@@ -27,30 +27,30 @@ public class ProductsController {
     }
 
     @GetMapping
-    public Page<ProductResponseDTO> getAllProducts(
+    public ResponseEntity<Page<ProductResponseDTO>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String direction
     ) {
-        return productService.getAllProducts(page, size, category, sortBy, direction);
+        return ResponseEntity.ok(productService.getAllProducts(page, size, category, sortBy, direction));
     }
 
     @GetMapping("/search")
-    public Page<ProductResponseDTO> searchProducts(
+    public ResponseEntity<Page<ProductResponseDTO>> searchProducts(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String direction
     ) {
-        return productService.searchProducts(keyword, page, size, sortBy, direction);
+        return ResponseEntity.ok(productService.searchProducts(keyword, page, size, sortBy, direction));
     }
 
     @GetMapping("/{id}")
-    public ProductResponseDTO getProductById(@PathVariable Long id) {
-        return productService.getProductById(id);
+    public ResponseEntity<ProductResponseDTO> getProductById(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.getProductById(id));
     }
 
     @PreAuthorize("hasRole('ADMIN')")

@@ -1,6 +1,6 @@
 package org.aystudios.Skincare.controller;
 
-import org.aystudios.Skincare.dto.AddToCartRequestDTO;
+import org.aystudios.Skincare.dto.CartRequestDTO;
 import org.aystudios.Skincare.dto.CartResponseDTO;
 import org.aystudios.Skincare.service.CartService;
 import org.springframework.http.ResponseEntity;
@@ -20,11 +20,11 @@ public class CartController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> addToCart(@RequestBody AddToCartRequestDTO dto){
+    public ResponseEntity<CartResponseDTO> addToCart(@RequestBody CartRequestDTO dto){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        cartService.addToCart(email, dto);
-        return ResponseEntity.ok().build();
+        CartResponseDTO response = cartService.addToCart(email, dto);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping
@@ -35,13 +35,17 @@ public class CartController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping
-    public ResponseEntity<Void> removeFromCart(@RequestParam Long productId){
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<Void> removeFromCart(@PathVariable Long productId){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
 
         cartService.removeItem(email, productId);
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<CartResponseDTO>> getAllCart(){
+        List<CartResponseDTO> response = cartService.getAllCartItems();
+        return ResponseEntity.ok(response);
+    }
 }

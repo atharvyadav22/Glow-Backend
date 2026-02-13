@@ -29,7 +29,7 @@ public class UserService {
         UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
 
         user.setName(dto.getName());
-        user.setPhoneNo(dto.getPhone());
+        user.setPhoneNo(dto.getPhoneNo());
         user.setAddress(dto.getAddress());
         user.setProfilePicUrl(dto.getProfilePicUrl());
 

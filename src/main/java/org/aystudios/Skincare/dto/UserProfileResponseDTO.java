@@ -2,7 +2,6 @@ package org.aystudios.Skincare.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.aystudios.Skincare.entity.Role;
 
 @Data
 @AllArgsConstructor
