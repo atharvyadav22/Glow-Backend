@@ -1,6 +1,7 @@
 package org.aystudios.Skincare.service;
 
 import org.aystudios.Skincare.dto.CartRequestDTO;
+import org.aystudios.Skincare.dto.CartItemResponseDTO;
 import org.aystudios.Skincare.dto.CartResponseDTO;
 import org.aystudios.Skincare.entity.CartItemEntity;
 import org.aystudios.Skincare.entity.ProductEntity;
@@ -14,6 +15,7 @@ import org.aystudios.Skincare.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +30,22 @@ public class CartService {
         this.cartRepository = cartRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
+    }
+
+    // ----- Cart Response Builder -----
+    private CartResponseDTO buildCartResponse(Long userId){
+
+        List<CartItemEntity> cartItems = cartRepository.findByUserId(userId);
+        List<CartItemResponseDTO> response = new ArrayList<>();
+        BigDecimal totalPrice = BigDecimal.ZERO;
+
+        for(CartItemEntity item: cartItems){
+            BigDecimal itemTotal = item.getProduct().getDiscountPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
+            totalPrice = totalPrice.add(itemTotal);
+            response.add(CartMapper.toResponse(item));
+        }
+
+        return new CartResponseDTO(response, totalPrice);
     }
 
     // ----- Add to Cart -----
@@ -46,32 +64,21 @@ public class CartService {
             cartItemEntity.setQuantity(cartItemEntity.getQuantity() + dto.getQuantity());
         }
 
-        CartItemEntity response = cartRepository.save(cartItemEntity);
-        return CartMapper.toResponse(response);
+        cartRepository.save(cartItemEntity);
+        return buildCartResponse(userEntity.getId());
     }
 
     // ----- Get Cart Items -----
-    public List<CartResponseDTO> getMyCart(String email) {
+    public CartResponseDTO getMyCart(String email) {
 
-        UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(email));
-
-        List<CartItemEntity> cartItems = cartRepository.findByUser(user);
-
-        List<CartResponseDTO> response = new ArrayList<>();
-
-        for (CartItemEntity item : cartItems) {
-            CartResponseDTO dto = CartMapper.toResponse(item);
-            response.add(dto);
-        }
-
-        return response;
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+        return buildCartResponse(userEntity.getId());
     }
 
 
     // ----- Remove Item -----
     @Transactional
-    public void removeItem(String email, Long productId) {
+    public CartResponseDTO removeItem(String email, Long productId) {
 
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));
@@ -80,10 +87,13 @@ public class CartService {
                 .orElseThrow(() -> new ProductNotFoundException());
 
         cartRepository.deleteByUserAndProduct(user, product);
+
+        return buildCartResponse(user.getId());
     }
 
+    // TODO: Fix N+1 Query by using Joins
     // ----- Get All Cart Items -----
-    public List<CartResponseDTO> getAllCartItems(){
+    public List<CartItemResponseDTO> getAllCartItems(){
 
         List<CartItemEntity> entity = cartRepository.findAll();
 

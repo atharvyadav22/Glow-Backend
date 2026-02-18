@@ -18,6 +18,13 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.util.List;
 
+/*
+FIXME:
+ Use UserPrincipal user = new UserPrincipal(id, email);
+ UserPrincipal user = new UserPrincipal(id, email);
+ UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, authorities);
+*/
+
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 

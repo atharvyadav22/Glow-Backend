@@ -14,6 +14,8 @@ import java.util.List;
 @RequestMapping("/api/products")
 public class ProductsController {
 
+    // FIXME: Add ResponseEntity for all endpoints
+
     private final ProductService productService;
 
     public ProductsController(ProductService productService) {

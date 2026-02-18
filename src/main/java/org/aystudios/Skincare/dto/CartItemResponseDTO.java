@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
-public class CartResponseDTO {
+public class CartItemResponseDTO {
 
     private Long productId;
     private int quantity;

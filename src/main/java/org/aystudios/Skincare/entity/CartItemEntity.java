@@ -17,7 +17,7 @@ public class CartItemEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id") // Default This is the foreign key name so optional to write
     private UserEntity user;
 
     @ManyToOne

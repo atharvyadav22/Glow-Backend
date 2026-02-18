@@ -1,9 +1,11 @@
 package org.aystudios.Skincare.controller;
 
 import org.aystudios.Skincare.dto.CartRequestDTO;
+import org.aystudios.Skincare.dto.CartItemResponseDTO;
 import org.aystudios.Skincare.dto.CartResponseDTO;
 import org.aystudios.Skincare.service.CartService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +21,7 @@ public class CartController {
         this.cartService = cartService;
     }
 
+    // FIXME: Change Auth to Long Id
     @PostMapping
     public ResponseEntity<CartResponseDTO> addToCart(@RequestBody CartRequestDTO dto){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -27,25 +30,27 @@ public class CartController {
         return ResponseEntity.ok(response);
     }
 
+    // FIXME: Change Auth to Long Id
     @GetMapping
-    public ResponseEntity<List<CartResponseDTO>> getCartItems(){
+    public ResponseEntity<CartResponseDTO> getCartItems(@AuthenticationPrincipal Long userId){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        List<CartResponseDTO> response = cartService.getMyCart(email);
+        CartResponseDTO response = cartService.getMyCart(email);
         return ResponseEntity.ok(response);
     }
 
+    // FIXME: Change Auth to Long Id
     @DeleteMapping("/{productId}")
-    public ResponseEntity<Void> removeFromCart(@PathVariable Long productId){
+    public ResponseEntity<CartResponseDTO> removeFromCart(@PathVariable Long productId){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        cartService.removeItem(email, productId);
-        return ResponseEntity.ok().build();
+        CartResponseDTO response = cartService.removeItem(email, productId);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<CartResponseDTO>> getAllCart(){
-        List<CartResponseDTO> response = cartService.getAllCartItems();
+    public ResponseEntity<List<CartItemResponseDTO>> getAllCart(){
+        List<CartItemResponseDTO> response = cartService.getAllCartItems();
         return ResponseEntity.ok(response);
     }
 }

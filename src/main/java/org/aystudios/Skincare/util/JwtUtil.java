@@ -21,7 +21,8 @@ public class JwtUtil {
     private static final String ACCESS  = "access";
     private static final String REFRESH = "refresh";
 
-    private static final long ACCESS_EXPIRY  = 15 * 60 * 1000;
+//    private static final long ACCESS_EXPIRY = 15 * 60 * 1000;
+    private static final long ACCESS_EXPIRY  = 7 * 24 * 60 * 60 * 1000;
     private static final long REFRESH_EXPIRY = 7 * 24 * 60 * 60 * 1000;
 
     public JwtUtil(@Value("${jwt.secret}") String secret) {
