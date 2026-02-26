@@ -1,20 +1,18 @@
 package org.aystudios.Skincare.service;
 
-import org.aystudios.Skincare.dto.CartRequestDTO;
-import org.aystudios.Skincare.dto.CartItemResponseDTO;
-import org.aystudios.Skincare.dto.CartResponseDTO;
+import org.aystudios.Skincare.dto.*;
 import org.aystudios.Skincare.entity.CartItemEntity;
 import org.aystudios.Skincare.entity.ProductEntity;
 import org.aystudios.Skincare.entity.UserEntity;
 import org.aystudios.Skincare.exception.auth.UserNotFoundException;
 import org.aystudios.Skincare.exception.product.ProductNotFoundException;
 import org.aystudios.Skincare.mapper.CartMapper;
+import org.aystudios.Skincare.mapper.UserMapper;
 import org.aystudios.Skincare.repository.CartRepository;
 import org.aystudios.Skincare.repository.ProductRepository;
 import org.aystudios.Skincare.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +31,7 @@ public class CartService {
     }
 
     // ----- Cart Response Builder -----
+    @Transactional(readOnly = true)
     private CartResponseDTO buildCartResponse(Long userId){
 
         List<CartItemEntity> cartItems = cartRepository.findByUserId(userId);
@@ -49,6 +48,7 @@ public class CartService {
     }
 
     // ----- Add to Cart -----
+    @Transactional
     public CartResponseDTO addToCart(String email, CartRequestDTO dto) {
 
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
@@ -98,6 +98,21 @@ public class CartService {
         List<CartItemEntity> entity = cartRepository.findAll();
 
         return entity.stream().map(CartMapper::toResponse).toList();
+    }
+
+    // ----- Cart Checkout -----
+    public CartCheckoutResponseDTO checkout(String email){
+
+        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+        UserProfileResponseDTO userProfile = UserMapper.toDTO(userEntity);
+
+        List<PaymentMode> paymentModes = new ArrayList<>();
+        for (PaymentMode mode: PaymentMode.values()){
+            paymentModes.add(mode);
+        }
+
+        return new CartCheckoutResponseDTO(userProfile, buildCartResponse(userEntity.getId()), paymentModes);
+
     }
 
 
