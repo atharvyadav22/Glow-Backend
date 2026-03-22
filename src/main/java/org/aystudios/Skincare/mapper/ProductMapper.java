@@ -11,6 +11,7 @@ public class ProductMapper {
         ProductEntity p = new ProductEntity();
 
         p.setName(dto.getName());
+        p.setImage(dto.getImage());
         p.setBrand(dto.getBrand());
         p.setCategory(dto.getCategory());
         p.setDescription(dto.getDescription());
@@ -25,6 +26,7 @@ public class ProductMapper {
         return new ProductResponseDTO(
                 p.getId(),
                 p.getName(),
+                p.getImage(),
                 p.getBrand(),
                 p.getCategory(),
                 p.getDescription(),
