@@ -22,7 +22,8 @@
 ## 🚀 Overview
 
 Glow is a **scalable backend system** supporting a cross-platform skincare app (Android · iOS · Desktop).
-It handles authentication, product catalogue, cart, orders, and payments using a **clean layered architecture** and **stateless JWT security**.
+It handles authentication, product catalogue, cart, orders, and payments using a **clean layered architecture** and *
+*stateless JWT security**.
 
 ---
 
@@ -32,7 +33,8 @@ It handles authentication, product catalogue, cart, orders, and payments using a
 
 > [!IMPORTANT]
 > This API runs on Render free tier and **spins down after inactivity**.
-> Open the app and hit **Test** or visit the link below in your browser first — this wakes the server and allocates resources. Takes around **60 seconds** on cold start. All requests after that are fast.
+> Open the app and hit **Test** or visit the link below in your browser first — this wakes the server and allocates
+> resources. Takes around **60 seconds** on cold start. All requests after that are fast.
 
 ### ⚡ Wake Server
 
@@ -43,7 +45,7 @@ It handles authentication, product catalogue, cart, orders, and payments using a
 ## 🛠️ Tech Stack
 
 | Layer      | Technology                        |
-| ---------- | --------------------------------- |
+|------------|-----------------------------------|
 | Language   | Java 17                           |
 | Framework  | Spring Boot 3                     |
 | Security   | Spring Security · JWT (Stateless) |
@@ -83,7 +85,7 @@ Authorization: Bearer <access_token>
 ### 🔑 Auth — `/api/auth`
 
 | Method | Endpoint    | Auth     | Description                |
-| ------ | ----------- | -------- | -------------------------- |
+|--------|-------------|----------|----------------------------|
 | `GET`  | `/test`     | Public   | Health check / wake server |
 | `POST` | `/signup`   | Public   | Register user              |
 | `POST` | `/login`    | Public   | Login → returns tokens     |
@@ -95,7 +97,7 @@ Authorization: Bearer <access_token>
 ### 👤 User — `/api/user`
 
 | Method | Endpoint | Auth   | Description    |
-| ------ | -------- | ------ | -------------- |
+|--------|----------|--------|----------------|
 | `GET`  | `/`      | 🔐 JWT | Get profile    |
 | `PUT`  | `/`      | 🔐 JWT | Update profile |
 
@@ -104,7 +106,7 @@ Authorization: Bearer <access_token>
 ### 📦 Products — `/api/products`
 
 | Method   | Endpoint               | Auth     | Description                         |
-| -------- | ---------------------- | -------- | ----------------------------------- |
+|----------|------------------------|----------|-------------------------------------|
 | `GET`    | `/`                    | Public   | All products (pagination + filters) |
 | `GET`    | `/search`              | Public   | Search products                     |
 | `GET`    | `/{id}`                | Public   | Get product by ID                   |
@@ -119,7 +121,7 @@ Authorization: Bearer <access_token>
 ### 🛒 Cart — `/api/cart`
 
 | Method   | Endpoint       | Auth   | Description      |
-| -------- | -------------- | ------ | ---------------- |
+|----------|----------------|--------|------------------|
 | `POST`   | `/`            | 🔐 JWT | Add to cart      |
 | `GET`    | `/`            | 🔐 JWT | Get cart         |
 | `DELETE` | `/{productId}` | 🔐 JWT | Remove item      |
@@ -131,7 +133,7 @@ Authorization: Bearer <access_token>
 ### ❤️ Favourites — `/api/favourites`
 
 | Method | Endpoint       | Auth   | Description      |
-| ------ | -------------- | ------ | ---------------- |
+|--------|----------------|--------|------------------|
 | `GET`  | `/`            | 🔐 JWT | Get favourites   |
 | `GET`  | `/{productId}` | 🔐 JWT | Check favourite  |
 | `POST` | `/{productId}` | 🔐 JWT | Toggle favourite |
@@ -140,19 +142,19 @@ Authorization: Bearer <access_token>
 
 ### 🧾 Orders — `/api/order`
 
-| Method   | Endpoint            | Auth   | Description       |
-| -------- | ------------------- | ------ | ----------------- |
-| `POST`   | `/`                 | 🔐 JWT | Create order      |
-| `GET`    | `/`                 | 🔐 JWT | Get orders        |
-| `PATCH`  | `/{orderId}/status` | 🔐 JWT | Update status     |
-| `DELETE` | `/`                 | 🔐 JWT | Delete all orders |
+| Method   | Endpoint            | Auth     | Description   |
+|----------|---------------------|----------|---------------|
+| `POST`   | `/`                 | 🔐 JWT   | Create order  |
+| `GET`    | `/`                 | 🔐 JWT   | Get orders    |
+| `PATCH`  | `/{orderId}/status` | 🔐 JWT   | Update status |
+| `DELETE` | `/{orderId}`        | 🔑 Admin | Delete order  |
 
 ---
 
 ### 💳 Payment — `/api/payment`
 
 | Method | Endpoint         | Auth   | Description      |
-| ------ | ---------------- | ------ | ---------------- |
+|--------|------------------|--------|------------------|
 | `POST` | `/{orderId}/pay` | 🔐 JWT | Simulate payment |
 
 ---
@@ -171,22 +173,24 @@ All errors return a consistent structured response via `@RestControllerAdvice`:
 }
 ```
 
-| Exception | Code | HTTP Status |
-|-----------|------|-------------|
-| `UserNotFoundException` | `USER_NOT_FOUND` | `404 Not Found` |
-| `UserAlreadyExistedException` | `USER_ALREADY_EXISTS` | `409 Conflict` |
-| `InvalidPasswordException` | `UNAUTHORIZED` | `401 Unauthorized` |
-| `InvalidTokenException` | `UNAUTHORIZED` | `401 Unauthorized` |
-| `TokenExpiredException` | `UNAUTHORIZED` | `401 Unauthorized` |
-| `UnauthorizedActionException` | `FORBIDDEN` | `403 Forbidden` |
-| `ProductNotFoundException` | `RESOURCE_NOT_FOUND` | `404 Not Found` |
-| `ResourceNotFoundException` | `RESOURCE_NOT_FOUND` | `404 Not Found` |
-| `NoHandlerFoundException` | `ENDPOINT_NOT_FOUND` | `404 Not Found` |
-| `HttpRequestMethodNotSupportedException` | `METHOD_NOT_ALLOWED` | `405 Method Not Allowed` |
-| `AuthenticationException` | `AUTH_REQUIRED` | `401 Unauthorized` |
-| `AccessDeniedException` | `ACCESS_DENIED` | `403 Forbidden` |
+| Exception                                | Code                  | HTTP Status              |
+|------------------------------------------|-----------------------|--------------------------|
+| `UserNotFoundException`                  | `USER_NOT_FOUND`      | `404 Not Found`          |
+| `UserAlreadyExistedException`            | `USER_ALREADY_EXISTS` | `409 Conflict`           |
+| `InvalidPasswordException`               | `UNAUTHORIZED`        | `401 Unauthorized`       |
+| `InvalidTokenException`                  | `UNAUTHORIZED`        | `401 Unauthorized`       |
+| `TokenExpiredException`                  | `UNAUTHORIZED`        | `401 Unauthorized`       |
+| `UnauthorizedActionException`            | `FORBIDDEN`           | `403 Forbidden`          |
+| `ProductNotFoundException`               | `RESOURCE_NOT_FOUND`  | `404 Not Found`          |
+| `ResourceNotFoundException`              | `RESOURCE_NOT_FOUND`  | `404 Not Found`          |
+| `NoHandlerFoundException`                | `ENDPOINT_NOT_FOUND`  | `404 Not Found`          |
+| `HttpRequestMethodNotSupportedException` | `METHOD_NOT_ALLOWED`  | `405 Method Not Allowed` |
+| `AuthenticationException`                | `AUTH_REQUIRED`       | `401 Unauthorized`       |
+| `AccessDeniedException`                  | `ACCESS_DENIED`       | `403 Forbidden`          |
 
-> **Security layer:** `401` and `403` responses for missing or invalid JWT tokens are handled directly in `SecurityFilterChain` via a custom `authenticationEntryPoint` and `accessDeniedHandler` — before the request ever reaches a controller.
+> **Security layer:** `401` and `403` responses for missing or invalid JWT tokens are handled directly in
+`SecurityFilterChain` via a custom `authenticationEntryPoint` and `accessDeniedHandler` — before the request ever
+> reaches a controller.
 
 ---
 
@@ -214,7 +218,6 @@ spring.datasource.url=jdbc:postgresql://localhost:5432/glow
 spring.datasource.username=YOUR_DB_USER
 spring.datasource.password=YOUR_DB_PASSWORD
 spring.jpa.hibernate.ddl-auto=update
-
 jwt.secret=YOUR_256_BIT_SECRET
 jwt.access-expiry=900000
 jwt.refresh-expiry=604800000
