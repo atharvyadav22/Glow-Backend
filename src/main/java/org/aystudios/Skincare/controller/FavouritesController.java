@@ -1,5 +1,6 @@
 package org.aystudios.Skincare.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.aystudios.Skincare.dto.FavouriteResponseDTO;
 import org.aystudios.Skincare.dto.ProductResponseDTO;
 import org.aystudios.Skincare.service.FavouritesService;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/favourites")
+@Tag(name = "5. Favourites")
 public class FavouritesController {
 
     //FIXME: Use Long Id instead of String email for auth

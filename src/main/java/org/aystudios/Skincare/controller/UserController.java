@@ -1,5 +1,6 @@
 package org.aystudios.Skincare.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.aystudios.Skincare.dto.UserProfileRequestDTO;
 import org.aystudios.Skincare.dto.UserProfileResponseDTO;
 import org.aystudios.Skincare.service.UserService;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/user")
+@Tag(name = "7. User profile")
 public class UserController {
 
     private final UserService userService;

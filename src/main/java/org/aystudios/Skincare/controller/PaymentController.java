@@ -1,5 +1,6 @@
 package org.aystudios.Skincare.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.aystudios.Skincare.dto.OrderResponseDTO;
  import org.aystudios.Skincare.service.PaymentService;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/payment")
+@Tag(name = "6. Payments")
 public class PaymentController {
 
     private final PaymentService paymentService;

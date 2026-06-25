@@ -1,5 +1,6 @@
 package org.aystudios.Skincare.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.aystudios.Skincare.dto.MyOrderResponseDTO;
 import org.aystudios.Skincare.dto.OrderRequestDTO;
 import org.aystudios.Skincare.dto.OrderResponseDTO;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/order")
+@Tag(name = "4. Orders")
 public class OrderController {
 
 

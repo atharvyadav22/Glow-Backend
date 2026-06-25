@@ -1,5 +1,6 @@
 package org.aystudios.Skincare.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.aystudios.Skincare.dto.ProductRequestDTO;
 import org.aystudios.Skincare.dto.ProductResponseDTO;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
+@Tag(name = "2. Products")
 public class ProductsController {
 
     // FIXME: Add ResponseEntity for all endpoints

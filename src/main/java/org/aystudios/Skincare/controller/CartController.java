@@ -1,5 +1,6 @@
 package org.aystudios.Skincare.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.aystudios.Skincare.dto.CartCheckoutResponseDTO;
 import org.aystudios.Skincare.dto.CartRequestDTO;
 import org.aystudios.Skincare.dto.CartItemResponseDTO;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/cart")
+@Tag(name = "3. Cart")
 public class CartController {
 
     private final CartService cartService;
