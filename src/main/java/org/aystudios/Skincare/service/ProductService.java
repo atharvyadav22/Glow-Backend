@@ -7,6 +7,7 @@ import org.aystudios.Skincare.exception.general.ResourceNotFoundException;
 import org.aystudios.Skincare.mapper.ProductMapper;
 import org.aystudios.Skincare.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -46,7 +47,7 @@ ProductService {
         return productEntities.map(item -> ProductMapper.toResponse(item));
     }
 
-
+    @Cacheable(value = "products", key = "#id")
     public ProductResponseDTO getProductById(Long id) {
         ProductEntity entity = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found with id " + id));
 

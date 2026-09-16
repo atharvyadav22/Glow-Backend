@@ -12,6 +12,7 @@ import org.aystudios.Skincare.repository.CartRepository;
 import org.aystudios.Skincare.repository.ProductRepository;
 import org.aystudios.Skincare.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
