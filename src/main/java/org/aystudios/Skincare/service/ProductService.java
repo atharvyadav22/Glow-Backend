@@ -8,6 +8,8 @@ import org.aystudios.Skincare.mapper.ProductMapper;
 import org.aystudios.Skincare.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -63,6 +65,7 @@ ProductService {
     }
 
 
+    @CachePut(value = "products", key = "#id")
     public ProductResponseDTO updateProduct(Long id, ProductRequestDTO dto) {
 
         ProductEntity existing = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found with id " + id));
@@ -80,6 +83,7 @@ ProductService {
     }
 
 
+    @CacheEvict(value = "products", key = "#id")
     public void deleteProduct(Long id) {
 
         if (!productRepository.existsById(id)) {
