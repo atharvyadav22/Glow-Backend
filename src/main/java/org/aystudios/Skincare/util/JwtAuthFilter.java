@@ -45,14 +45,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (token != null && jwtUtil.isValidAccessToken(token)) {
 
+            Long userId = jwtUtil.extractUserId(token);
             String email = jwtUtil.extractEmail(token);
             String role  = jwtUtil.extractRole(token);
 
+            org.aystudios.Skincare.security.CustomUserDetails userDetails = 
+                    new org.aystudios.Skincare.security.CustomUserDetails(userId, email, role);
+
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(
-                            email,
+                            userDetails,
                             null,
-                            List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                            userDetails.getAuthorities()
                     );
 
             SecurityContextHolder.getContext().setAuthentication(auth);

@@ -17,6 +17,7 @@ public class JwtUtil {
 
     private static final String TYPE = "type";
     private static final String ROLE = "role";
+    private static final String USER_ID = "userId";
 
     private static final String ACCESS  = "access";
     private static final String REFRESH = "refresh";
@@ -31,15 +32,16 @@ public class JwtUtil {
 
     // ---------- TOKEN GENERATION ----------
 
-    public String generateAccessToken(String email, String role) {
-        return buildToken(email, role, ACCESS, ACCESS_EXPIRY);
+    public String generateAccessToken(Long userId, String email, String role) {
+        return buildToken(userId, email, role, ACCESS, ACCESS_EXPIRY);
     }
 
-    public String generateRefreshToken(String email) {
-        return buildToken(email, null, REFRESH, REFRESH_EXPIRY);
+    public String generateRefreshToken(Long userId, String email) {
+        return buildToken(userId, email, null, REFRESH, REFRESH_EXPIRY);
     }
 
     private String buildToken(
+            Long userId,
             String email,
             String role,
             String type,
@@ -47,6 +49,7 @@ public class JwtUtil {
     ) {
         return Jwts.builder()
                 .setSubject(email)
+                .claim(USER_ID, userId)
                 .claim(TYPE, type)
                 .claim(ROLE, role)
                 .setIssuedAt(new Date())
@@ -75,6 +78,10 @@ public class JwtUtil {
     }
 
     // ---------- CLAIM EXTRACTION ----------
+
+    public Long extractUserId(String token) {
+        return extractAllClaims(token).get(USER_ID, Long.class);
+    }
 
     public String extractEmail(String token) {
         return extractAllClaims(token).getSubject();
