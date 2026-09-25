@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.aystudios.Skincare.security.CustomUserDetails;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -27,18 +29,18 @@ public class OrderController {
 
     // TODO: Fix Auth
     @PostMapping
-    public ResponseEntity<OrderResponseDTO> createOrder(@AuthenticationPrincipal String email, @RequestBody OrderRequestDTO dto){
+    public ResponseEntity<OrderResponseDTO> createOrder(@AuthenticationPrincipal CustomUserDetails user, @Valid @RequestBody OrderRequestDTO dto){
 
-        OrderResponseDTO response = orderService.createOrder(email, dto);
+        OrderResponseDTO response = orderService.createOrder(user.getId(), dto);
 
         return ResponseEntity.ok(response);
 
     }
 
     @GetMapping
-    public ResponseEntity<List<MyOrderResponseDTO>> getOrders(@AuthenticationPrincipal String email){
+    public ResponseEntity<List<MyOrderResponseDTO>> getOrders(@AuthenticationPrincipal CustomUserDetails user){
 
-        List<MyOrderResponseDTO> response = orderService.getMyOrders(email);
+        List<MyOrderResponseDTO> response = orderService.getMyOrders(user.getId());
 
         return ResponseEntity.ok(response);
     }

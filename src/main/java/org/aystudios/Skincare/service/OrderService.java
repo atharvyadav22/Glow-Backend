@@ -30,13 +30,11 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponseDTO createOrder(String email, OrderRequestDTO dto) {
+    public OrderResponseDTO createOrder(Long userId, OrderRequestDTO dto) {
 
-        // Step 1: Fetch User by email
-        UserEntity userEntity = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(email));
-
-        Long userId = userEntity.getId();
+        // Step 1: Ensure User exists
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         // Step 2: Get Cart Items of user
         List<CartItemEntity> cartItems = cartRepository.findByUserId(userId);
@@ -121,10 +119,10 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public List<MyOrderResponseDTO> getMyOrders(String email) {
+    public List<MyOrderResponseDTO> getMyOrders(Long userId) {
 
-        UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(email));
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         return orderRepository
                 .findByUserIdOrderByCreatedAtDesc(user.getId())
