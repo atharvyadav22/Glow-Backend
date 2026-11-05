@@ -1,6 +1,5 @@
 package org.aystudios.Skincare.controller;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.aystudios.Skincare.dto.LoginRequestDTO;

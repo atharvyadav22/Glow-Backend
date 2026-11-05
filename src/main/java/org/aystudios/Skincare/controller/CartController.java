@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import org.aystudios.Skincare.security.CustomUserDetails;
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/cart")
 @Tag(name = "3. Cart")
@@ -24,31 +27,22 @@ public class CartController {
         this.cartService = cartService;
     }
 
-    // FIXME: Change Auth to Long Id
     @PostMapping
-    public ResponseEntity<CartResponseDTO> addToCart(@RequestBody CartRequestDTO dto){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        CartResponseDTO response = cartService.addToCart(email, dto);
+    public ResponseEntity<CartResponseDTO> addToCart(@AuthenticationPrincipal CustomUserDetails user, @Valid @RequestBody CartRequestDTO dto){
+        CartResponseDTO response = cartService.addToCart(user.getId(), dto);
         return ResponseEntity.ok(response);
     }
 
-    // FIXME: Change Auth to Long Id
     // FIXME: Add Paginator
     @GetMapping
-    public ResponseEntity<CartResponseDTO> getCartItems(@AuthenticationPrincipal Long userId){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        CartResponseDTO response = cartService.getMyCart(email);
+    public ResponseEntity<CartResponseDTO> getCartItems(@AuthenticationPrincipal CustomUserDetails user){
+        CartResponseDTO response = cartService.getMyCart(user.getId());
         return ResponseEntity.ok(response);
     }
 
-    // FIXME: Change Auth to Long Id
     @DeleteMapping("/{productId}")
-    public ResponseEntity<CartResponseDTO> removeFromCart(@PathVariable Long productId){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        CartResponseDTO response = cartService.removeItem(email, productId);
+    public ResponseEntity<CartResponseDTO> removeFromCart(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long productId){
+        CartResponseDTO response = cartService.removeItem(user.getId(), productId);
         return ResponseEntity.ok(response);
     }
 
@@ -59,8 +53,8 @@ public class CartController {
     }
 
     @GetMapping("/checkout")
-    public ResponseEntity<CartCheckoutResponseDTO> checkout(@AuthenticationPrincipal String email){
-        CartCheckoutResponseDTO response = cartService.checkout(email);
+    public ResponseEntity<CartCheckoutResponseDTO> checkout(@AuthenticationPrincipal CustomUserDetails user){
+        CartCheckoutResponseDTO response = cartService.checkout(user.getId());
         return ResponseEntity.ok(response);
     }
 }
