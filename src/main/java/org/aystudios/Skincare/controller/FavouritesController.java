@@ -7,6 +7,7 @@ import org.aystudios.Skincare.service.FavouritesService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.aystudios.Skincare.security.CustomUserDetails;
 import java.util.List;
 
 @RestController
@@ -14,7 +15,6 @@ import java.util.List;
 @Tag(name = "5. Favourites")
 public class FavouritesController {
 
-    //FIXME: Use Long Id instead of String email for auth
     private final FavouritesService favouritesService;
 
     public FavouritesController(FavouritesService favouritesService){
@@ -23,23 +23,23 @@ public class FavouritesController {
 
 
     @GetMapping
-    public ResponseEntity<List<ProductResponseDTO>> getAllFavourites(@AuthenticationPrincipal String email){
-        List<ProductResponseDTO> response = favouritesService.getFavourites(email);
+    public ResponseEntity<List<ProductResponseDTO>> getAllFavourites(@AuthenticationPrincipal CustomUserDetails user){
+        List<ProductResponseDTO> response = favouritesService.getFavourites(user.getId());
 
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<FavouriteResponseDTO> isFavourite(@AuthenticationPrincipal String email, @PathVariable Long productId){
-        FavouriteResponseDTO response = favouritesService.isFavourite(email, productId);
+    public ResponseEntity<FavouriteResponseDTO> isFavourite(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long productId){
+        FavouriteResponseDTO response = favouritesService.isFavourite(user.getId(), productId);
 
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/{productId}")
-    public ResponseEntity<FavouriteResponseDTO> toggleFavourites(@AuthenticationPrincipal String email, @PathVariable Long productId){
+    public ResponseEntity<FavouriteResponseDTO> toggleFavourites(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long productId){
 
-        FavouriteResponseDTO responseDTO = favouritesService.toggleFavourite(email, productId);
+        FavouriteResponseDTO responseDTO = favouritesService.toggleFavourite(user.getId(), productId);
         return ResponseEntity.ok(responseDTO);
     }
 }

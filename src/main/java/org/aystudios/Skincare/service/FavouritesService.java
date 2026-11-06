@@ -30,19 +30,16 @@ public class FavouritesService {
         this.userRepository = userRepository;
     }
 
-    //FIXME: Return type
     // ----- Add to Favourites -----
     @Transactional
-    public FavouriteResponseDTO toggleFavourite(String email, Long productId){
-
-        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
-        Long userId = userEntity.getId();
+    public FavouriteResponseDTO toggleFavourite(Long userId, Long productId){
 
         if (favouritesRepository.existsByUserIdAndProductId(userId, productId)) {
             favouritesRepository.deleteByUserIdAndProductId(userId, productId);
             return new FavouriteResponseDTO(false);
         }
         else {
+            UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
             ProductEntity productEntity = productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException());
             FavouritesEntity entity = new FavouritesEntity(null, userEntity,productEntity);
             favouritesRepository.save(entity);
@@ -52,10 +49,7 @@ public class FavouritesService {
     }
 
     // ----- Checks if Product is Favourite -----
-    public FavouriteResponseDTO isFavourite(String email, Long productId){
-
-        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
-        Long userId = userEntity.getId();
+    public FavouriteResponseDTO isFavourite(Long userId, Long productId){
 
         Boolean isFavourite = favouritesRepository.existsByUserIdAndProductId(userId, productId);
 
@@ -65,13 +59,10 @@ public class FavouritesService {
     // TODO: Fix N+1 Query by using Joins
     // ----- Get Favourites List -----
     @Transactional
-    public List<ProductResponseDTO> getFavourites(String email) {
-
-        UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(email));
+    public List<ProductResponseDTO> getFavourites(Long userId) {
 
         List<FavouritesEntity> list =
-                favouritesRepository.findByUserId(user.getId());
+                favouritesRepository.findByUserId(userId);
 
         List<ProductResponseDTO> response = new ArrayList<>();
 
