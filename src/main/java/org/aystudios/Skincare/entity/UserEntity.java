@@ -1,5 +1,6 @@
 package org.aystudios.Skincare.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +21,7 @@ public class UserEntity {
     private String email;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -30,4 +32,3 @@ public class UserEntity {
     private String address;
     private String profilePicUrl;
 }
-
