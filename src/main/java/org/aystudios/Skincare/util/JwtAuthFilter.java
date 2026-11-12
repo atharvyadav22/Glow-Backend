@@ -4,26 +4,14 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.aystudios.Skincare.entity.UserEntity;
-import org.aystudios.Skincare.repository.UserRepository;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpStatus;
+import org.aystudios.Skincare.security.CustomUserDetails;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.util.List;
-
-/*
-FIXME:
- Use UserPrincipal user = new UserPrincipal(id, email);
- UserPrincipal user = new UserPrincipal(id, email);
- UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, authorities);
-*/
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -43,23 +31,24 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = resolveToken(request);
 
-        if (token != null && jwtUtil.isValidAccessToken(token)) {
+        if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            jwtUtil.validateAccessToken(token).ifPresent(claims -> {
+                Long userId = jwtUtil.extractUserId(claims);
+                String email = jwtUtil.extractEmail(claims);
+                String role  = jwtUtil.extractRole(claims);
 
-            Long userId = jwtUtil.extractUserId(token);
-            String email = jwtUtil.extractEmail(token);
-            String role  = jwtUtil.extractRole(token);
+                CustomUserDetails userDetails = new CustomUserDetails(userId, email, role);
 
-            org.aystudios.Skincare.security.CustomUserDetails userDetails = 
-                    new org.aystudios.Skincare.security.CustomUserDetails(userId, email, role);
+                UsernamePasswordAuthenticationToken auth =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
+                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
-
-            SecurityContextHolder.getContext().setAuthentication(auth);
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            });
         }
 
         filterChain.doFilter(request, response);
@@ -68,7 +57,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private String resolveToken(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
-            return header.substring(7);
+            return header.substring(7).trim();
         }
         return null;
     }
