@@ -18,15 +18,16 @@ public class UserService {
     }
 
     // ----- Get Profile -----
-
-    public UserProfileResponseDTO getProfile(String email) {
-        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+    public UserProfileResponseDTO getProfile(Long userId) {
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
         return UserMapper.toDTO(userEntity);
     }
 
     // ----- Update Profile -----
-    public UserProfileResponseDTO updateProfile(String email, UserProfileRequestDTO dto) {
-        UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+    public UserProfileResponseDTO updateProfile(Long userId, UserProfileRequestDTO dto) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
 
         user.setName(dto.getName());
         user.setPhoneNo(dto.getPhoneNo());
